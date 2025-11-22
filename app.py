@@ -1,35 +1,59 @@
 import streamlit as st
-import requests
+from transformers import pipeline
 
-st.set_page_config(page_title="Nas Galaxy AI", page_icon="🚀", layout="wide")
+# Page setup
+st.set_page_config(
+    page_title="Nas Galaxy AI 🌌",
+    page_icon="🌌",
+    layout="wide"
+)
 
-# UI Title
-st.markdown("""
-    <h1 style='text-align:center; font-size:48px; margin-bottom:0;'>
-        🚀 NAS GALAXY AI
-    </h1>
-    <p style='text-align:center; font-size:20px; margin-top:0;'>
-        Ultra-fast AI • Emotional Intelligence • Coding • Creativity
-    </p>
-""", unsafe_allow_html=True)
+# Title
+st.markdown(
+    "<h1 style='text-align: center; color: #6C63FF;'>🌌 Nas Galaxy AI</h1>",
+    unsafe_allow_html=True
+)
+st.markdown(
+    "<p style='text-align: center; font-size:18px;'>Your all-in-one AI companion for emotional support and programming help</p>",
+    unsafe_allow_html=True
+)
 
-# Text input
-prompt = st.text_area("💬 Ask anything to Nas Galaxy AI:", height=150)
+# Load AI models (you can swap these later for bigger ones)
+summarizer = pipeline("summarization")
+qa_model = pipeline("question-answering")
 
-# Button
-if st.button("Generate 🚀"):
-    if prompt.strip():
-        with st.spinner("Galaxy thinking..."):
-            API_URL = "https://api.siliconflow.cn/v1/chat/completions"
-            API_KEY = st.secrets["API_KEY"]
+# Tabs for different modes
+tab1, tab2 = st.tabs(["💙 Emotional Support", "💻 Programming Help"])
 
-            headers = {"Authorization": f"Bearer {API_KEY}"}
-            data = {
-                "model": "deepseek-ai/DeepSeek-V3",
-                "messages": [{"role": "user", "content": prompt}]
-            }
+# Emotional Support Tab
+with tab1:
+    st.subheader("Share your thoughts 💭")
+    support_input = st.text_area("What's on your mind?", height=150)
 
-            response = requests.post(API_URL, json=data, headers=headers).json()
+    if st.button("Get Support"):
+        if support_input.strip():
+            # Simple summarizer as placeholder for emotional support
+            response = summarizer(support_input, max_length=60, min_length=20, do_sample=False)
+            st.success("✨ Here's some perspective:")
+            st.write(response[0]['summary_text'])
+        else:
+            st.warning("Please enter something to talk about.")
 
-            st.subheader("🌌 Response:")
-            st.write(response["choices"][0]["message"]["content"])
+# Programming Help Tab
+with tab2:
+    st.subheader("Ask your programming question 👨‍💻")
+    question = st.text_area("Describe your problem:", height=150)
+    context = st.text_area("Optional: paste related code or error message", height=150)
+
+    if st.button("Get Code Help"):
+        if question.strip():
+            # Placeholder QA model
+            if context.strip():
+                response = qa_model(question=question, context=context)
+                st.success("💡 Suggested Answer:")
+                st.write(response['answer'])
+            else:
+                st.info("Try pasting code or error message for better help.")
+                st.write("Example solution:\n```python\nprint('Hello World')\n```")
+        else:
+            st.warning("Please enter a programming question.")
